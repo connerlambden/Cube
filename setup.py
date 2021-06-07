@@ -7,7 +7,7 @@ setup(
     url='https://github.com/connerlambden/Cube',
     author='Conner Lambden',
     author_email='conner@connerpro.com',
-    license='BSD 2-clause',
+    license='MIT',
     packages=['pyexample'],
     install_requires=['scanpy',
                       'numpy', 
