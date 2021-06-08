@@ -1,5 +1,6 @@
 # Cubé
-Simple Nonparametric Gene Network Search Algorithm
+![Cubé](https://github.com/connerlambden/Cube/raw/main/cube%CC%81_header.jpg)
+## Simple Nonparametric Gene Network Search Algorithm
 
 ## How It Works
 Given a single-cell dataset and an input gene(s), Cubé looks for simple & nonlinear gene-gene relationships to construct a regulation network informed by prior gene signatures. For example, Cubé might give you the result that GeneA * GeneB ~= GeneC
