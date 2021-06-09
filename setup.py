@@ -14,7 +14,9 @@ setup(
                       'jit',
                       'networkx',
                       'anndata',
-                      'scipy'                   
+                      'scipy',
+                      'matplotlib',
+                      'pandas'               
                       ],
 
     classifiers=[
