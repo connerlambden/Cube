@@ -1,6 +1,5 @@
 import warnings
 warnings.filterwarnings('ignore')
-
 import scanpy as sc
 import numpy as np
 from numba import jit
@@ -11,7 +10,8 @@ import scanpy as sc
 import time
 import anndata
 from scipy.sparse import dok_matrix
-
+import matplotlib.pyplot as plt
+import pandas as pd
 
 
 
@@ -21,28 +21,6 @@ CN_MAX_LOW_SCORE = 0.2
 CN_MIN_HIGH_SCORE = 1
 ##################
 
-
-
-PROJECT_NAME = 'tcell_differentiation'
-########################################
-if PROJECT_NAME == 'lloyd_bko':
-    OBS_KEYS = ['sampleID', 'genotype']
-    OPTIMIZATION_OBS_KEY = 'sampleID'
-    BAD_GENES_SET = {'Junb', 'Jund'}
-elif PROJECT_NAME == 'bcell_timecourse':
-    OBS_KEYS = ['tissue', 'date', 'leiden']
-    OPTIMIZATION_OBS_KEY = 'tissue'
-elif PROJECT_NAME == 'homo':
-    OBS_KEYS = ['donor_organism.sex', 'louvain', 'celltype']
-    OPTIMIZATION_OBS_KEY = 'celltype'
-elif PROJECT_NAME == 'thelper':
-    OBS_KEYS = ['celltype']
-    OPTIMIZATION_OBS_KEY = 'celltype'
-    lower_gene_names = True
-else:
-    OBS_KEYS = ['timepoint']
-    OPTIMIZATION_OBS_KEY = 'timepoint'
-    lower_gene_names = True
 
 
 
@@ -262,7 +240,7 @@ def find_cancellations(adata, gene1, gene2, maxdepth, lower_gene_names, go_files
             if np.isnan(distance) or np.isinf(distance):
                 continue
             
-            print('Found connection:\t', source_node_name, '~', dest_node_name)
+            print('Found connection:\t', source_node_name, '~=', dest_node_name)
             G.add_edge(source_node_name, dest_node_name, weight=distance, correlation=correlation, pathway=pathway)
 
             if depth < maxdepth - 1:
@@ -271,78 +249,6 @@ def find_cancellations(adata, gene1, gene2, maxdepth, lower_gene_names, go_files
                             go_adata_size=go_adata_size, go_adata_names=go_adata_names, num_search_children=num_search_children)
 
     return G
-
-
-if PROJECT_NAME == 'bcell_timecourse':
-    
-    INPUT_ADATA = '/home/ec2-user/data/Time_Course_Cellbender_corrected_batch_correct_harmony_new_annotForCellphoneDB_scirpy_hvgs_only_bcells_only.h5ad'
-    gois = set([g.lower().capitalize() for g in {'tigit', 'havcr1','havcr2','icosl','pdcd1','nt5e','entpd1','mki67','il10','ifng','tnf'}])
-    EXTRA_COLS = ['tissue', 'date'] + list(gois)
-
-elif PROJECT_NAME == 'tcell_differentiation':
-    # INPUT_ADATA = '/home/ec2-user/data/tcell_differentiation_with_louvain_umap.h5ad'
-    INPUT_ADATA = '/home/ec2-user/data/tcell_differentiation_with_louvain_umap_log_semidefinite_hvgs.h5ad'
-    
-    gois = {'twist1', 'tbx21', 'stat4', 'runx3', 'ifng', 'il12rb2', 'p2rx7', 'dusp5', 'cd4', 'gata3', 'il4',
-                'stat1', 'stat4', 'stat6', 'il12', 'il18', 'nfat', 'ap1', 'nfkb1', 'il12a', 'il12rb2'}
-    EXTRA_COLS = ['n_genes', 'timepoint'] + list(gois)
-elif PROJECT_NAME == 'thelper':
-    INPUT_ADATA = '/home/ec2-user/data/thelper_hvgs.h5ad'
-    gois = {'twist1', 'tbx21', 'stat4', 'runx3', 'ifng', 'il12rb2', 'p2rx7', 'dusp5', 'cd4', 'gata3', 'il4',
-                'stat1', 'stat4', 'stat6', 'il12', 'il18', 'nfat', 'ap1', 'nfkb1', 'ccr5', 'il12a', 'il12rb2'}
-    EXTRA_COLS = ['celltype'] + list(gois)
-
-elif PROJECT_NAME == 'tcell_tfs':
-    EXTRA_COLS = ['n_genes', 'timepoint']
-    INPUT_ADATA = '/home/ec2-user/data/tcell_differentiation_with_louvain_umap_tfs_only.h5ad'
-    gois = {'twist1', 'tbx21', 'stat4', 'runx3', 'ifng', 'il12rb2', 'p2rx7', 'dusp5', 'ms4a4b', 'pla2g12a', 'crabp2', 'cd4', 'gata3', 'il4',
-                'stat1', 'stat4', 'stat6', 'il12', 'il18', 'nfat', 'ap1', 'nfkb'}
-
-elif PROJECT_NAME == 'ilc2':
-    EXTRA_COLS = ['n_counts', 'tissue', 'treatment']
-    INPUT_ADATA = '/home/ec2-user/lamp/ilc2_with_louvain_umap.h5ad'
-    gois = set([i.lower() for i in ['Thy1', 'Tbx21', 'Gata3', 'Rorc', 'Il1rl1', 
-                        'Il17rb', 'Klrg1', 'Cd3', 'Cd4', 'Cd8', 'Il7r', 'Foxp3', 'Il10', 'Il4', 'Il5', 'Il13', 
-                        'Ifng', 'Il17a', 'Il22', 'Nmur1', 'Ramp1', 'Ramp2', 'Ramp3', 'Calcrl', 'Vipr1', 'Vipr2', 
-                        'Calca', 'Calcb', 'Nmu', 'Vip', 'crem', 'ramp3', 'pdcd1', 'fam46a', 'Il5', 'Il13', 'Il1rl1']])
-elif PROJECT_NAME == 'lloyd_bko':
-    
-    INPUT_ADATA = '/home/ec2-user/data/WT_BKO_5hashed_B_cells_harmony_v2_HVGs.h5ad'
-    #INPUT_ADATA = '/home/ec2-user/data/WT_BKO_5hashed_B_cells_harmony_v2.h5ad'
-    
-    gois = set([g.lower().capitalize() for g in {'tigit', 'havcr1','havcr2','icosl','pdcd1','nt5e','entpd1','mki67','il10','ifng','tnf', 'cd74','ciita', 'H2-Ab1', 'H2-Aa', 'H2-Eb1', 'H2-DMb2', 'H2-Oa', 'H2-Ob', 'H2-Dma', 'H2-DMb1',
-            'H2-Ke6', 'H2-Ke2', 'H2-Eb2'}])
-
-    EXTRA_COLS = ['n_counts', 'leiden', 'tissue', 'genotype'] + list(gois)
-    
-elif PROJECT_NAME == 'lloyd_bko_Tum':
-    EXTRA_COLS = ['n_counts', 'sampleID', 'leiden', 'tissue', 'genotype']
-    INPUT_ADATA = '/home/ec2-user/data/Explore_WT_BKO_5prime_Hashed_bcells_only_logged_top_3k_HVGs_nonsparse_Tum_only.h5ad'
-    gois = [i.lower() for i in {'tigit','ctla4','areg','mki67','il10','ifng','tnf', 'ly6g', 'ly6c1', 'itgax', 'enpp1', 'mki67',
-            'ly6a', 'alox5ap', 'cd68', 'flt3', 'H2-Ab1', 'H2-Aa', 'H2-Eb1', 'H2-DMb2', 'H2-Oa', 'H2-Ob', 'H2-Dma', 'H2-DMb1', 
-            'H2-Ke6', 'H2-Ke2', 'H2-Eb2'}]
-
-elif PROJECT_NAME == 'lloyd_bko_dLN':
-    EXTRA_COLS = ['n_counts', 'sampleID', 'leiden', 'tissue', 'genotype']
-    INPUT_ADATA = '/home/ec2-user/data/Explore_WT_BKO_5prime_Hashed_bcells_only_logged_top_3k_HVGs_nonsparse_dLN_only.h5ad'
-    gois = [i.lower() for i in {'tigit','ctla4','areg','mki67','il10','ifng','tnf', 'ly6g', 'ly6c1', 'itgax', 'enpp1', 'mki67',
-            'ly6a', 'alox5ap', 'cd68', 'flt3', 'H2-Ab1', 'H2-Aa', 'H2-Eb1', 'H2-DMb2', 'H2-Oa', 'H2-Ob', 'H2-Dma', 'H2-DMb1', 
-            'H2-Ke6', 'H2-Ke2', 'H2-Eb2'}]
-
-elif PROJECT_NAME == 'lloyd_bko_nLN':
-    EXTRA_COLS = ['n_counts', 'sampleID', 'leiden', 'tissue', 'genotype']
-    INPUT_ADATA = '/home/ec2-user/data/Explore_WT_BKO_5prime_Hashed_bcells_only_logged_top_3k_HVGs_nonsparse_nLN_only.h5ad'
-    gois = [i.lower() for i in {'tigit','ctla4','areg','mki67','il10','ifng','tnf', 'ly6g', 'ly6c1', 'itgax', 'enpp1', 'mki67',
-            'ly6a', 'alox5ap', 'cd68', 'flt3', 'H2-Ab1', 'H2-Aa', 'H2-Eb1', 'H2-DMb2', 'H2-Oa', 'H2-Ob', 'H2-Dma', 'H2-DMb1', 
-            'H2-Ke6', 'H2-Ke2', 'H2-Eb2'}]
-
-elif PROJECT_NAME == 'homo':
-    # https://data.humancellatlas.org/explore/projects/cc95ff89-2e68-4a08-a234-480eca21ce79
-    gois = {'TBX21', 'STAT6', 'STAT4', 'IL4', 'RUNX3', 'TWIST1', 'GATA3', 'STAT1', 'NFKB', 'IL18', 'AP1', 
-            'CD4', 'CRABP2', 'IL12', 'DUSP5', 'NFAT', 'PLA2G12A', 'IL12RB2', 'IFNG', 'P2RX7', 'MS4A4B', 'IL3'}
-    EXTRA_COLS = OBS_KEYS
-    INPUT_ADATA = '/home/ec2-user/data/homo_sapiens_louvain_immune_hvgs.h5ad'
-
 
 
 def build_data_structures(go_files, lower_gene_names):
@@ -402,11 +308,14 @@ def run_cube(adata=None, seed_gene_1=None, seed_gene_2=None, go_files=None, out_
     assert len(out_directory) > 0, 'Bad output directory.'
     assert adata is not None, 'Must pass in valid AnnData object for adata. Example: adata=adata'
     assert seed_gene_1 is not None, 'Must enter at least one search gene! Examples: seed_gene_1=\'Ifng\''
-    assert go_files is not None, 'Must pass in TSV of gene signatures. Example: go_files=\'mygenelist.tsv\' or go_files=[\'gene_list1.tsv\', \'gene_list2.tsv\']. You can find some here: https://maayanlab.cloud/Enrichr/#stats'
+    assert go_files is not None, 'Must pass in TSV of gene signatures. Example: go_files=\'mygenelist.tsv\' or go_files=[\'gene_list1.tsv\', \'gene_list2.tsv\']. You can find some here: https://github.com/connerlambden/Cube/tree/main/pathways'
     if out_directory[-1] != '/':
         out_directory += '/'
     if not os.path.isdir(out_directory):
         os.mkdir(out_directory)
+
+    if search_depth > 2:
+        print('WARNING search_depth is greater than 2. This may take a while!!')
 
     if type(go_files) == list:
         for gf in go_files:
@@ -426,6 +335,7 @@ def run_cube(adata=None, seed_gene_1=None, seed_gene_2=None, go_files=None, out_
     if issparse(adata.X) or hasattr(adata.X, 'toarray'):
         adata.X = adata.X.toarray()
     assert not np.any(np.isnan(adata.X)), 'Found nans in expression matrix!!'
+    assert np.all(adata.X < 50), 'Cubé expects log(counts) data. You can use scanpy\'s log1p function'
     assert seed_gene_1 in adata.var.index, 'Seed Gene 1 not found in gene names!'
     if seed_gene_2 is not None:
         assert seed_gene_2 in adata.var.index, 'Seed Gene 2 not found in gene names!'
@@ -435,13 +345,51 @@ def run_cube(adata=None, seed_gene_1=None, seed_gene_2=None, go_files=None, out_
     if seed_gene_1 == seed_gene_1.lower():
         lower_gene_names = True
     G = find_cancellations(adata, seed_gene_1, seed_gene_2, search_depth, lower_gene_names, go_files, num_search_children=num_search_children)
-    out_name = 'Cubé_' + CN_GENE_1
+    out_name = 'Cubé_' + seed_gene_1
     if seed_gene_2 is not None:
-        out_name += '_' + str(CN_GENE_2)
+        out_name += '_' + str(seed_gene_2)
 
     
 
     nx.write_graphml(G, out_directory + out_name + '.graphml')
+
+
+    edges = G.edges()
+    edge_colors = ['green' if G[u][v]['correlation'] == 'positive' else 'red' for u, v in edges]
+    edge_widths = [5 for u, v in edges]
+    pos = nx.spring_layout(G, weight='weight', k=10)
+
+    for show_pathways in [True, False]:
+        plt.clf()
+        plt.cla()
+        fig, ax = plt.subplots(figsize=(20, 20))
+        nx.draw_networkx_nodes(G, pos, node_color='skyblue', ax=ax, node_size=2000)
+        nx.draw_networkx_labels(G, pos, ax=ax)
+        nx.draw_networkx_edges(G, pos, width=edge_widths, edge_color=edge_colors, ax=ax)
+        edge_labels = nx.get_edge_attributes(G, 'pathway')
+        if show_pathways:
+            nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_color='black', font_size=6, ax=ax, alpha=0.6)
+        plt.title('Cubé Gene Disccovery Network')
+        save_n = 'Cubé_network'
+        if not show_pathways:
+            save_n += '_without_pathway_names'
+        plt.tight_layout()
+        plt.savefig(out_directory + save_n + '.png', dpi=600)
+
+    edges_list = list(edges)
+    edges_list_names = [e[0] + ' ~= ' + e[1] for e in edges_list]
+
+    results_df = pd.DataFrame(index=edges_list_names, columns=['Correlation', 'Edge Weight', 'Pathway'])
+    results_df.index.name = 'Gene Interactions'
+    c = 0
+    for e in edges_list:
+        results_df['Correlation'].loc[edges_list_names[c]] = G.edges[e]['correlation']
+        results_df['Pathway'].loc[edges_list_names[c]] = G.edges[e]['pathway']
+        results_df['Edge Weight'].loc[edges_list_names[c]] = G.edges[e]['weight']
+        c += 1
+    results_df.to_csv(out_directory + 'Cubé_data_table.csv')
+
+
     
     print('DONE!!')
     print('🧊🧊')
@@ -449,6 +397,7 @@ def run_cube(adata=None, seed_gene_1=None, seed_gene_2=None, go_files=None, out_
 
 
 if __name__ == '__main__':
-    adata = sc.read_h5ad(INPUT_ADATA)
-    go_files = ['/home/ec2-user/data/BioPlanet_2019.tsv', '/home/ec2-user/data/GeneSigDB.tsv', '/home/ec2-user/data/KEGG_2019_Mouse.tsv']
-    run_cube(adata, CN_GENE_1, CN_GENE_2, go_files, '/home/ec2-user/lamp', search_depth=CN_MAX_DEPTH)
+    adata = sc.read_h5ad('/Users/cl144/Downloads/tcell_differentiation_with_louvain_umap_log_semidefinite_hvgs.h5ad')
+    go_files = ['/Users/cl144/Documents/Work/Cubé pypi/Signatures/BioPlanet_2019.tsv', '/Users/cl144/Documents/Work/Cubé pypi/Signatures/GeneSigDB.tsv', '/Users/cl144/Documents/Work/Cubé pypi/Signatures/KEGG_2019_Mouse.tsv']
+    run_cube(adata=adata, seed_gene_1='ifng', seed_gene_2='tbx21', go_files=go_files, 
+            out_directory='/Users/cl144/Downloads/cube_test', num_search_children=4, search_depth=2)
