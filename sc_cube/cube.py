@@ -389,15 +389,14 @@ def run_cube(adata=None, seed_gene_1=None, seed_gene_2=None, go_files=None, out_
         c += 1
     results_df.to_csv(out_directory + 'Cubé_data_table.csv')
 
-
     
     print('DONE!!')
     print('🧊🧊')
     ##############
 
 
-if __name__ == '__main__':
-    adata = sc.read_h5ad('/Users/cl144/Downloads/tcell_differentiation_with_louvain_umap_log_semidefinite_hvgs.h5ad')
-    go_files = ['/Users/cl144/Documents/Work/Cubé pypi/Signatures/BioPlanet_2019.tsv', '/Users/cl144/Documents/Work/Cubé pypi/Signatures/GeneSigDB.tsv', '/Users/cl144/Documents/Work/Cubé pypi/Signatures/KEGG_2019_Mouse.tsv']
-    run_cube(adata=adata, seed_gene_1='ifng', seed_gene_2='tbx21', go_files=go_files, 
-            out_directory='/Users/cl144/Downloads/cube_test', num_search_children=4, search_depth=2)
+# if __name__ == '__main__':
+#     adata = sc.read_h5ad('/Users/cl144/Downloads/tcell_differentiation_with_louvain_umap_log_semidefinite_hvgs.h5ad')
+#     go_files = ['/Users/cl144/Documents/Work/Cubé pypi/Signatures/BioPlanet_2019.tsv', '/Users/cl144/Documents/Work/Cubé pypi/Signatures/GeneSigDB.tsv', '/Users/cl144/Documents/Work/Cubé pypi/Signatures/KEGG_2019_Mouse.tsv']
+#     run_cube(adata=adata, seed_gene_1='ifng', seed_gene_2='tbx21', go_files=go_files, 
+#             out_directory='/Users/cl144/Downloads/cube_test', num_search_children=4, search_depth=2)
