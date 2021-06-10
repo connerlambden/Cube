@@ -3,7 +3,7 @@
 ## Intuitive Nonparametric Gene Network Search Algorithm
 
 ### How It Works
-Given a single-cell dataset and an input gene(s), Cubé looks for simple & nonlinear gene-gene relationships to construct a regulation network informed by prior gene signatures. For example, Cubé might give you the result that GeneA * GeneB ~= GeneC potentially meaning that genes A & B coregulate to produce C, or there is some other nonlinear relationship. Cubé then recursively feeds outputs back into itself to great a gene network.
+Given a single-cell dataset and an input gene(s), Cubé looks for simple & nonlinear gene-gene relationships to construct a regulation network informed by prior gene signatures. For example, Cubé might give you the result that GeneA * GeneB ~= GeneC, potentially meaning that genes A & B coregulate to produce C, or there is some other nonlinear relationship. Cubé then recursively feeds outputs back into itself to great a gene network.
 
 ![Cubé](https://github.com/connerlambden/Cube/raw/main/cube_network_genes_discovery.png)
 
@@ -17,27 +17,28 @@ Given a single-cell dataset and an input gene(s), Cubé looks for simple & nonli
 ```
 from sc_cube import cube
 import scanpy as sc
-adata = sc.read_h5ad('my_expression_data.h5ad')
-go_files = ['BioPlanet_2019.tsv', 'GeneSigDB.tsv']
+adata = sc.read_h5ad('my_expression_data.h5ad') # Load AnnData Object
+go_files = ['BioPlanet_2019.tsv', 'GeneSigDB.tsv'] # Load Gene Signatures to Search In
+
 cube.run_cube(adata=adata, seed_gene_1='ifng', seed_gene_2='tbx21', go_files=go_files, 
             out_directory='Cubé_Results', num_search_children=4, search_depth=2)
 ```
 
 ### Parameters
 
-- adata: [Anndata Object](https://anndata.readthedocs.io/en/latest/) with logged expression matrix
-- seed_gene_1: Starting search gene of interest
-- seed_gene_2: Optional: Additional seed gene of interest to search for seed_gene_1 * seed_gene_2
-- go_files: List of Pathway files to search in. Each edge in Cubé requires all connected genes to be present in at least 2 ppathways. [Examples To Download](https://github.com/connerlambden/Cube/tree/main/pathways) or [Download More From Enrichr](https://maayanlab.cloud/Enrichr/#stats)
-- out_directory: Folder to put results
-- num_search_children: How many search children to add to the network on each iteration. For example, a value of 2 will add two children to each node.
-- search_depth: Recursive search depth. Values above 2 may take a long time to run
+__adata__: [AnnData Object](https://anndata.readthedocs.io/en/latest/) with logged expression matrix
+__seed_gene_1__: Starting search gene of interest
+__seed_gene_2__: Optional: Additional seed gene of interest to search for seed_gene_1 * seed_gene_2
+__go_files__: List of Pathway files to search in. Each edge in Cubé requires all connected genes to be present in at least 2 pathways. [Examples To Download](https://github.com/connerlambden/Cube/tree/main/pathways) or [Download More From Enrichr](https://maayanlab.cloud/Enrichr/#stats)
+__out_directory__: Folder to put results
+__num_search_children__: How many search children to add to the network on each iteration. For example, a value of 2 will add two children to each node.
+__search_depth__: Recursive search depth. Values above 2 may take a long time to run
 
 ### Outputs
 
-- Cubé_data_table.csv: Table showing the genes, pathways, and weight for each edge in the network. Positive correlations will have small edge weights and negative correlations will have large edge weights.
-- *.graphml file. Network file that can be visualized in programs like [Cytoscape](https://cytoscape.org/)
-- Cubé_network.png: Network visualization where green edges are positive correlation & red edges are negative correlation. For better visualizations, we recommend loading the .graphml file [Cytoscape](https://cytoscape.org/)
+__Cubé_data_table.csv__: Table showing the genes, pathways, and weight for each edge in the network. Positive correlations will have small edge weights and negative correlations will have large edge weights.
+__*.graphml file__. Network file that can be visualized in programs like [Cytoscape](https://cytoscape.org/)
+__Cubé_network.png__: Network visualization where green edges are positive correlation & red edges are negative correlation. For better visualizations, we recommend loading the .graphml file [Cytoscape](https://cytoscape.org/)
 
 ### Introduction
 
