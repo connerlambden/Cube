@@ -24,6 +24,8 @@ cube.run_cube(adata=adata, seed_gene_1='ifng', seed_gene_2='tbx21', go_files=go_
             out_directory='Cubé_Results', num_search_children=4, search_depth=2)
 ```
 
+__[Example Outputs](https://github.com/connerlambden/Cube/blob/main/cube_example_results.zip?raw=true)__
+
 ### Parameters
 
 __adata__: [AnnData Object](https://anndata.readthedocs.io/en/latest/) with logged expression matrix
