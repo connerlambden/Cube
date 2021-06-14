@@ -10,7 +10,7 @@ Given a single-cell dataset and an input gene(s), Cubé looks for simple & nonli
 ### Install
 
 
-`$ python -m pip install git+https://github.com/connerlambden/Cube.git`
+`$ python3 -m pip install git+https://github.com/connerlambden/Cube.git`
 
 ### Running Cubé
 

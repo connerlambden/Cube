@@ -9,13 +9,10 @@ setup(
     author_email='conner@connerpro.com',
     license='MIT',
     packages=['sc_cube'],
-    install_requires=['scanpy',
-                      'numpy', 
+    install_requires=['numpy', 
                       'jit',
                       'networkx',
-                      'anndata',
                       'scipy',
-                      'matplotlib',
                       'pandas'               
                       ],
 
