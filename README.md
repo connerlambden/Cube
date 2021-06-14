@@ -50,6 +50,19 @@ __*.graphml file__. Network file that can be visualized in programs like [Cytosc
 
 __Cubé_network.png__: Network visualization where green edges are positive correlation & red edges are negative correlation. For better visualizations, we recommend loading the .graphml file into [Cytoscape](https://cytoscape.org/)
 
+### Visualizing The Product of 2 Genes Using Scanpy
+
+```
+import numpy as np
+# Visualizing Product of 2 Genes using Scanpy (assuming adata.X is logged)
+gene_1 = 'ifng'
+gene_2 = 'tbx21'
+adata_expressing_both = adata[(adata[:,gene_1].X.toarray().flatten() > 0) & (adata[:,gene_2].X.toarray().flatten() > 0),:]
+adata_expressing_both.obs[gene_1 + ' * ' + gene_2] = np.exp(adata_expressing_both[:,gene_1].X.toarray() + adata_expressing_both[:,gene_2].X.toarray())
+sc.pl.umap(adata_expressing_both, color=[gene_1 + ' * ' + gene_2])
+```
+
+
 ### Why Cubé?
 
 ![Cubé](https://github.com/connerlambden/Cube/raw/main/images/gata3_cube_gene_network.png)
