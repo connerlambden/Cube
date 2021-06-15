@@ -54,7 +54,7 @@ __Cubé_network.png__: Network visualization where green edges are positive corr
 
 ```
 import numpy as np
-# Visualizing Product of 2 Genes using Scanpy (assuming adata.X is logged)
+# Visualizing Product of 2 Genes using Scanpy (assuming adata.X is logged and sparse)
 gene_1 = 'ifng'
 gene_2 = 'tbx21'
 adata_expressing_both = adata[(adata[:,gene_1].X.toarray().flatten() > 0) & (adata[:,gene_2].X.toarray().flatten() > 0),:]
