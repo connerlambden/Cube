@@ -342,6 +342,7 @@ def run_cube(adata=None, seed_gene_1=None, seed_gene_2=None, go_files=None, out_
 
     adata.var_names_make_unique()
     
+    lower_gene_names = False
     if seed_gene_1 == seed_gene_1.lower():
         lower_gene_names = True
     G = find_cancellations(adata, seed_gene_1, seed_gene_2, search_depth, lower_gene_names, go_files, num_search_children=num_search_children)
@@ -395,8 +396,14 @@ def run_cube(adata=None, seed_gene_1=None, seed_gene_2=None, go_files=None, out_
     ##############
 
 
-# if __name__ == '__main__':
-#     adata = sc.read_h5ad('/Users/cl144/Downloads/tcell_differentiation_with_louvain_umap_log_semidefinite_hvgs.h5ad')
-#     go_files = ['/Users/cl144/Documents/Work/Cubé pypi/Signatures/BioPlanet_2019.tsv', '/Users/cl144/Documents/Work/Cubé pypi/Signatures/GeneSigDB.tsv', '/Users/cl144/Documents/Work/Cubé pypi/Signatures/KEGG_2019_Mouse.tsv']
-#     run_cube(adata=adata, seed_gene_1='ifng', seed_gene_2='tbx21', go_files=go_files, 
-#             out_directory='/Users/cl144/Downloads/cube_test', num_search_children=4, search_depth=2)
+if __name__ == '__main__':
+    adata = sc.read_h5ad('/Users/cl144/Downloads/tcell_differentiation_with_louvain_umap_log_semidefinite_hvgs.h5ad')
+    go_files = ['/Users/cl144/Documents/Work/Cubé pypi/Signatures/BioPlanet_2019.tsv', '/Users/cl144/Documents/Work/Cubé pypi/Signatures/GeneSigDB.tsv', '/Users/cl144/Documents/Work/Cubé pypi/Signatures/KEGG_2019_Mouse.tsv']
+    # Visualizing Product of 2 Genes using Scanpy (assuming adata.X is logged)
+    gene_1 = 'ifng'
+    gene_2 = 'tbx21'
+    adata_expressing_both = adata[(adata[:,gene_1].X.toarray().flatten() > 0) & (adata[:,gene_2].X.toarray().flatten() > 0),:]
+    adata_expressing_both.obs[gene_1 + ' * ' + gene_2] = np.exp(adata_expressing_both[:,gene_1].X.toarray() + adata_expressing_both[:,gene_2].X.toarray())
+    sc.pl.umap(adata_expressing_both, color=[gene_1 + ' * ' + gene_2])
+    #run_cube(adata=adata, seed_gene_1='ifng', seed_gene_2='tbx21', go_files=go_files, 
+    #        out_directory='/Users/cl144/Downloads/cube_test', num_search_children=4, search_depth=2)
