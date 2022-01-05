@@ -26,6 +26,8 @@ cube.run_cube(adata=adata, seed_gene_1='ifng', seed_gene_2='tbx21', go_files=go_
 
 __[Example Outputs](https://github.com/connerlambden/Cube/blob/main/cube_example_results.zip?raw=true)__
 
+__Memory__: Depending on the size of your data, Cubé should have at least 32GiB of RAM or else you might get Segmentation Faults
+
 ### Parameters
 
 __adata__: [AnnData Object](https://anndata.readthedocs.io/en/latest/) with logged expression matrix
@@ -42,7 +44,7 @@ __num_search_children__: How many search children to add to the network on each 
 
 __search_depth__: Recursive search depth. Values above 2 may take a long time to run
 
-Memory: Depending on the size of your data, Cubé should have at least 32GiB of RAM or else you might get Segmentation Faults
+
 
 ### Outputs
 
