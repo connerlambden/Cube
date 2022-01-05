@@ -322,6 +322,9 @@ def run_cube(adata=None, seed_gene_1=None, seed_gene_2=None, go_files=None, out_
     if not os.path.isdir(out_directory):
         os.mkdir(out_directory)
 
+    if adata.shape[1] > 3000:
+        print('WARNING: Found', adata.shape[1], 'genes. So many genes could potentially cause memory errors. We recommend subsetting to Highly Variable Genes first.')
+
     if search_depth > 2:
         print('WARNING search_depth is greater than 2. This may take a while!!')
 
@@ -342,6 +345,8 @@ def run_cube(adata=None, seed_gene_1=None, seed_gene_2=None, go_files=None, out_
 
     if issparse(adata.X) or hasattr(adata.X, 'toarray'):
         adata.X = adata.X.toarray()
+    
+    print('type(adata.X)', type(adata.X))
     assert not np.any(np.isnan(adata.X)), 'Found nans in expression matrix!!'
     assert np.all(adata.X < 50), 'Cubé expects log(counts) data. You can use scanpy\'s log1p function'
     assert seed_gene_1 in adata.var.index, 'Seed Gene 1 not found in gene names!'
