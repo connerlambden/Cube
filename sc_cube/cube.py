@@ -152,12 +152,12 @@ def run_summation_fast(dense_expr, input_g1_idx, input_g2_idx, skip_gene_indices
 
 
 @jit
-def find_cancellations(adata, gene1, gene2, maxdepth, lower_gene_names, go_files, 
+def find_cancellations(adata, gene1, gene2, maxdepth, go_files, 
                     skip_gene_indices={-100}, depth=0, G=nx.Graph(), go_adata_dense=None, go_adata_size=None, 
                     go_adata_names=None, num_search_children=4):
 
     if go_adata_dense is None:
-        go_adata = build_data_structures(go_files, lower_gene_names)
+        go_adata = build_data_structures(adata, go_files)
         go_adata_names = list(go_adata.obs.index)
         go_adata_dense = go_adata.X
         go_adata_size = np.array(go_adata.obs['size'], dtype=np.int)
@@ -244,18 +244,18 @@ def find_cancellations(adata, gene1, gene2, maxdepth, lower_gene_names, go_files
             G.add_edge(source_node_name, dest_node_name, weight=distance, correlation=correlation, pathway=pathway)
 
             if depth < maxdepth - 1:
-                G = find_cancellations(adata, dest_g1, dest_g2, maxdepth, lower_gene_names, go_files, 
+                G = find_cancellations(adata, dest_g1, dest_g2, maxdepth, go_files, 
                         skip_gene_indices=skip_gene_indices, depth=depth + 1, G=G, go_adata_dense=go_adata_dense, 
                             go_adata_size=go_adata_size, go_adata_names=go_adata_names, num_search_children=num_search_children)
 
     return G
 
 
-def build_data_structures(go_files, lower_gene_names):
+def build_data_structures(adata, go_files):
     go_dict = dict()
     genes_set = set()
     valid_gene_symbols = set(adata.var.index)
-    go_adata_dict = dict()
+
     pathway_list = []
     for go_file in go_files:
         go_data = open(go_file, 'r').readlines()
@@ -268,14 +268,22 @@ def build_data_structures(go_files, lower_gene_names):
             else:
                 pathway_name = t_split[0]
             g_list = None
-            if lower_gene_names:
-                g_list_total = [g.lower() for g in t_split[1:] if len(g) > 0 and g != '\n']
-                g_list = [g for g in g_list_total if g in valid_gene_symbols]
-                go_adata_dict[pathway_name] = len(g_list_total)
-            else:
-                g_list_total = [g.lower().capitalize() for g in t_split[1:] if len(g) > 0 and g != '\n']
-                g_list = [g for g in g_list_total if g in valid_gene_symbols]
-                go_adata_dict[pathway_name] = len(g_list_total)
+
+            ###
+
+            ### Will adapt gene names to either abc, Abc, or ABC depending on what matches!
+            g_list = []
+            for potential_gene in t_split[1:]:
+                if len(potential_gene) == 0 or potential_gene == '\n':
+                    continue
+                if potential_gene.lower() in valid_gene_symbols:
+                    g_list.append(potential_gene.lower())
+                elif potential_gene.lower().capitalize() in valid_gene_symbols:
+                    g_list.append(potential_gene.lower().capitalize())
+                elif potential_gene.upper() in valid_gene_symbols:
+                    g_list.append(potential_gene.upper())
+
+
             if len(g_list) < 4:
                 counter += 1
                 continue
@@ -342,10 +350,8 @@ def run_cube(adata=None, seed_gene_1=None, seed_gene_2=None, go_files=None, out_
 
     adata.var_names_make_unique()
     
-    lower_gene_names = False
-    if seed_gene_1 == seed_gene_1.lower():
-        lower_gene_names = True
-    G = find_cancellations(adata, seed_gene_1, seed_gene_2, search_depth, lower_gene_names, go_files, num_search_children=num_search_children)
+
+    G = find_cancellations(adata, seed_gene_1, seed_gene_2, search_depth, go_files, num_search_children=num_search_children)
     out_name = 'Cubé_' + seed_gene_1
     if seed_gene_2 is not None:
         out_name += '_' + str(seed_gene_2)
