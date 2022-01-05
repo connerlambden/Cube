@@ -176,9 +176,9 @@ def find_cancellations(adata, gene1, gene2, maxdepth, go_files,
         source_node_name += ' * ' + gene2
         if gene2 + ' * ' + gene1 in G.nodes:
             source_node_name = gene2 + ' * ' + gene1
-    adata_ss = adata[np.array(adata[:,gene1].X.toarray()).flatten() > 0]
+    adata_ss = adata[np.array(adata[:,gene1].X.todense()).flatten() > 0]
     if gene2 is not None:
-        adata_ss = adata_ss[np.array(adata_ss[:,gene2].X.toarray()).flatten() > 0]
+        adata_ss = adata_ss[np.array(adata_ss[:,gene2].X.todense()).flatten() > 0]
     
     
     input_g1_idx = list(adata_ss.var.index).index(gene1)
@@ -196,10 +196,10 @@ def find_cancellations(adata, gene1, gene2, maxdepth, go_files,
 
     dense_expr = adata_ss.X
     if issparse(dense_expr):
-        dense_expr = adata_ss.X.toarray() ##assumption!!!
+        dense_expr = adata_ss.X.todense() ##assumption!!!
 
     if issparse(go_adata_dense):
-        go_adata_dense = np.array(go_adata_dense.toarray(), dtype=np.int)
+        go_adata_dense = np.array(go_adata_dense.todense(), dtype=np.int)
 
     start = time.time()
 
@@ -340,11 +340,11 @@ def run_cube(adata=None, seed_gene_1=None, seed_gene_2=None, go_files=None, out_
     assert adata.shape[0] >= 200, 'Need at least 200 cells to run!'
     first_cell = adata.X[0].copy()
     if issparse(first_cell):
-        first_cell = first_cell.toarray()
+        first_cell = first_cell.todense()
     assert np.all(first_cell >= 0), 'Cubé expects all positive logged counts'
 
-    if issparse(adata.X) or hasattr(adata.X, 'toarray'):
-        adata.X = adata.X.toarray()
+    if issparse(adata.X) or hasattr(adata.X, 'todense'):
+        adata.X = adata.X.todense()
     
     # print('type(adata.X)', type(adata.X))
     try:
@@ -417,8 +417,8 @@ if __name__ == '__main__':
     # Visualizing Product of 2 Genes using Scanpy (assuming adata.X is logged)
     gene_1 = 'ifng'
     gene_2 = 'tbx21'
-    adata_expressing_both = adata[(adata[:,gene_1].X.toarray().flatten() > 0) & (adata[:,gene_2].X.toarray().flatten() > 0),:]
-    adata_expressing_both.obs[gene_1 + ' * ' + gene_2] = np.exp(adata_expressing_both[:,gene_1].X.toarray() + adata_expressing_both[:,gene_2].X.toarray())
+    adata_expressing_both = adata[(adata[:,gene_1].X.todense().flatten() > 0) & (adata[:,gene_2].X.todense().flatten() > 0),:]
+    adata_expressing_both.obs[gene_1 + ' * ' + gene_2] = np.exp(adata_expressing_both[:,gene_1].X.todense() + adata_expressing_both[:,gene_2].X.todense())
     sc.pl.umap(adata_expressing_both, color=[gene_1 + ' * ' + gene_2])
     #run_cube(adata=adata, seed_gene_1='ifng', seed_gene_2='tbx21', go_files=go_files, 
     #        out_directory='/Users/cl144/Downloads/cube_test', num_search_children=4, search_depth=2)
