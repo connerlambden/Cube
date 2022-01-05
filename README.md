@@ -34,7 +34,7 @@ __seed_gene_1__: Starting search gene of interest
 
 __seed_gene_2__: Optional: Additional seed gene of interest to search for seed_gene_1 * seed_gene_2
 
-__go_files__: List of Pathway files to search in. Each edge in Cubé requires all connected genes to be present in at least 2 pathways. [Examples To Download](https://github.com/connerlambden/Cube/tree/main/pathways) or [Download More From Enrichr](https://maayanlab.cloud/Enrichr/#stats)
+__go_files__: List of Pathway files to search in. Each edge in Cubé requires all connected genes to be present in at least 2 pathways. [Examples To Download](https://github.com/connerlambden/Cube/tree/main/pathways) or [Download More From Enrichr](https://maayanlab.cloud/Enrichr/#libraries). Cubé will automatically take care of pathway gene names casing to match your data.
 
 __out_directory__: Folder to put results
 
@@ -74,4 +74,4 @@ Single-cell RNA sequencing has allowed for unprecedented resolution into the tra
 
 ![Cubé](https://github.com/connerlambden/Cube/raw/main/images/cube_gene_regulatory_network.png)
 
-Special Thanks to [Vijay Kuchroo](https://kuchroolab.bwh.harvard.edu/), [Ana Anderson](https://anacandersonlab.com/), [Lloyd Bod](https://twitter.com/lloydcaipi), & [Aviv Regev](https://www.broadinstitute.org/regev-lab)
+Special Thanks to [Vijay Kuchroo](https://kuchroolab.bwh.harvard.edu/) & [Ana Anderson](https://anacandersonlab.com/)
