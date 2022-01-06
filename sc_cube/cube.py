@@ -322,7 +322,7 @@ def run_cube(adata=None, seed_gene_1=None, seed_gene_2=None, go_files=None, out_
     if not os.path.isdir(out_directory):
         os.mkdir(out_directory)
 
-    if adata.shape[1] > 3000:
+    if adata.shape[1] > 5000:
         print('WARNING: Found', adata.shape[1], 'genes. So many genes could potentially cause memory errors. We recommend subsetting to Highly Variable Genes first (eg "adata = adata[:,adata.var[\'highly_variable\']]").')
 
     if search_depth > 2:
