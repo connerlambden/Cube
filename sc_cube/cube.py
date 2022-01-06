@@ -24,7 +24,7 @@ CN_MIN_HIGH_SCORE = 1
 
 
 
-#@jit(nopython=True, parallel=False)
+@jit(nopython=True, parallel=False)
 def cancel_distance_function(a, b):
 
     a = (a - np.mean(a)) / np.std(a)
@@ -34,7 +34,7 @@ def cancel_distance_function(a, b):
     return np.median(diff)
 
 
-#@jit(nopython=True, parallel=False)
+@jit(nopython=True, parallel=False)
 def run_summation_fast(dense_expr, input_g1_idx, input_g2_idx, skip_gene_indices, num_search_children, gene2, go_adata_dense, go_adata_size):
     num_genes = dense_expr.shape[1]
     gene_nonzero = dense_expr > 0
@@ -89,6 +89,7 @@ def run_summation_fast(dense_expr, input_g1_idx, input_g2_idx, skip_gene_indices
             go_adata_dense_ss = go_adata_dense_ss[valid_pathways,:]
             if go_adata_dense_ss.shape[0] < 3:
                 continue
+
             go_adata_size_ss = go_adata_size[valid_pathways]
             go_adata_names_ss = go_adata_names[valid_pathways]
             
@@ -151,7 +152,7 @@ def run_summation_fast(dense_expr, input_g1_idx, input_g2_idx, skip_gene_indices
      
 
 
-#@jit
+@jit
 def find_cancellations(adata, gene1, gene2, maxdepth, go_files, 
                     skip_gene_indices={-100}, depth=0, G=nx.Graph(), go_adata_dense=None, go_adata_size=None, 
                     go_adata_names=None, num_search_children=4):
@@ -205,7 +206,7 @@ def find_cancellations(adata, gene1, gene2, maxdepth, go_files,
 
     res = run_summation_fast(dense_expr, input_g1_idx, input_g2_idx, skip_gene_indices, num_search_children, gene2, go_adata_dense, go_adata_size)
 
-    print('Iteration took', round(time.time() - start, 2), 'seconds!!')
+    print('Search Iteration took', round(time.time() - start, 2), 'seconds!')
 
     skip_gene_indices.add(input_g1_idx)
     if gene2 is not None:
@@ -307,7 +308,7 @@ def build_data_structures(adata, go_files):
     go_adata = anndata.AnnData(X=mat, obs=pathway_list, var=gene_list)
     go_adata.obs.index = pathway_list
     go_adata.var.index = gene_list
-    go_adata.obs['size'] = np.sum(go_adata.X, axis=1)
+    go_adata.obs['size'] = np.array(np.sum(go_adata.X, axis=1))
     return go_adata
 
 
@@ -322,8 +323,8 @@ def run_cube(adata=None, seed_gene_1=None, seed_gene_2=None, go_files=None, out_
     if not os.path.isdir(out_directory):
         os.mkdir(out_directory)
 
-    if adata.shape[1] > 5000:
-        print('WARNING: Found', adata.shape[1], 'genes. So many genes could potentially cause memory errors. We recommend subsetting to Highly Variable Genes first (eg "adata = adata[:,adata.var[\'highly_variable\']]").')
+    if adata.shape[1] > 3000:
+        print('WARNING: Found', adata.shape[1], 'genes. So many genes could potentially take a lil while. We recommend subsetting to Highly Variable Genes first (eg "adata = adata[:,adata.var[\'highly_variable\']]").')
 
     if search_depth > 2:
         print('WARNING search_depth is greater than 2. This may take a while!!')
@@ -349,7 +350,7 @@ def run_cube(adata=None, seed_gene_1=None, seed_gene_2=None, go_files=None, out_
     # print('type(adata.X)', type(adata.X))
     assert not np.any(np.isnan(adata.X)), 'Found nans in expression matrix!!'
 
-    assert np.all(adata.X < 50), 'Cubé expects log(counts) data. You can use scanpy\'s log1p function'
+    assert np.all(adata.X < 100), 'Cubé expects log(counts) data. You can use scanpy\'s log1p function'
     assert seed_gene_1 in adata.var.index, 'Seed Gene 1 not found in gene names!'
     if seed_gene_2 is not None:
         assert seed_gene_2 in adata.var.index, 'Seed Gene 2 not found in gene names!'
@@ -409,13 +410,12 @@ def run_cube(adata=None, seed_gene_1=None, seed_gene_2=None, go_files=None, out_
 
 
 if __name__ == '__main__':
-    adata = sc.read_h5ad('/Users/cl144/Downloads/tcell_differentiation_with_louvain_umap_log_semidefinite_hvgs.h5ad')
-    go_files = ['/Users/cl144/Documents/Work/Cubé pypi/Signatures/BioPlanet_2019.tsv', '/Users/cl144/Documents/Work/Cubé pypi/Signatures/GeneSigDB.tsv', '/Users/cl144/Documents/Work/Cubé pypi/Signatures/KEGG_2019_Mouse.tsv']
-    # Visualizing Product of 2 Genes using Scanpy (assuming adata.X is logged)
-    gene_1 = 'ifng'
-    gene_2 = 'tbx21'
-    adata_expressing_both = adata[(adata[:,gene_1].X.toarray().flatten() > 0) & (adata[:,gene_2].X.toarray().flatten() > 0),:]
-    adata_expressing_both.obs[gene_1 + ' * ' + gene_2] = np.exp(adata_expressing_both[:,gene_1].X.toarray() + adata_expressing_both[:,gene_2].X.toarray())
-    sc.pl.umap(adata_expressing_both, color=[gene_1 + ' * ' + gene_2])
-    #run_cube(adata=adata, seed_gene_1='ifng', seed_gene_2='tbx21', go_files=go_files, 
-    #        out_directory='/Users/cl144/Downloads/cube_test', num_search_children=4, search_depth=2)
+
+    adata = sc.read_h5ad('tumor_cd8_hvgs.h5ad') # Load AnnData Object (Highly Variable Genes Only)
+    print('adata.shape', adata.shape)
+    go_files = ['BioPlanet_2019.tsv', 'GeneSigDB.tsv'] # Load Gene Signatures to Search In
+
+    run_cube(adata=adata, seed_gene_1='Cd4', seed_gene_2='Il2ra', go_files=go_files, 
+                out_directory='Cubé_Results', num_search_children=4, search_depth=2)
+
+    print('DONE')
