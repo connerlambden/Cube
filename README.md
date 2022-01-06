@@ -17,7 +17,7 @@ Given a single-cell dataset and an input gene(s), Cubé looks for simple & nonli
 ```
 from sc_cube import cube
 import scanpy as sc
-adata = sc.read_h5ad('my_expression_data.h5ad') # Load AnnData Object (Highly Variable Genes Only)
+adata = sc.read_h5ad('my_expression_data.h5ad') # Load AnnData Object (Highly Variable Genes Only Recommended)
 go_files = ['BioPlanet_2019.tsv', 'GeneSigDB.tsv'] # Load Gene Signatures to Search In
 
 cube.run_cube(adata=adata, seed_gene_1='ifng', seed_gene_2='tbx21', go_files=go_files, 
@@ -26,7 +26,7 @@ cube.run_cube(adata=adata, seed_gene_1='ifng', seed_gene_2='tbx21', go_files=go_
 
 __[Example Outputs](https://github.com/connerlambden/Cube/blob/main/cube_example_results.zip?raw=true)__
 
-__Memory__: Depending on the size of your data, Cubé should have at least 16GiB of RAM or else you might get Segmentation Faults
+__Memory__: Depending on the size of your data, Cubé should have at least 16GiB of RAM.
 
 ### Parameters
 
