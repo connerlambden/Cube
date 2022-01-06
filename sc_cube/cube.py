@@ -24,7 +24,7 @@ CN_MIN_HIGH_SCORE = 1
 
 
 
-@jit(nopython=True, parallel=False)
+#@jit(nopython=True, parallel=False)
 def cancel_distance_function(a, b):
 
     a = (a - np.mean(a)) / np.std(a)
@@ -34,7 +34,7 @@ def cancel_distance_function(a, b):
     return np.median(diff)
 
 
-@jit(nopython=True, parallel=False)
+#@jit(nopython=True, parallel=False)
 def run_summation_fast(dense_expr, input_g1_idx, input_g2_idx, skip_gene_indices, num_search_children, gene2, go_adata_dense, go_adata_size):
     num_genes = dense_expr.shape[1]
     gene_nonzero = dense_expr > 0
@@ -151,7 +151,7 @@ def run_summation_fast(dense_expr, input_g1_idx, input_g2_idx, skip_gene_indices
      
 
 
-@jit
+#@jit
 def find_cancellations(adata, gene1, gene2, maxdepth, go_files, 
                     skip_gene_indices={-100}, depth=0, G=nx.Graph(), go_adata_dense=None, go_adata_size=None, 
                     go_adata_names=None, num_search_children=4):
