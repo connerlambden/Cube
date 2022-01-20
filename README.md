@@ -1,7 +1,8 @@
 # Cubé
 ![Cubé](https://github.com/connerlambden/Cube/raw/main/images/cube%CC%81_header.jpg)
 ## Intuitive Nonparametric Gene Network Search Algorithm
-
+  
+</br>
 
 
 ## How It Works
@@ -9,7 +10,7 @@ Given a single-cell dataset and an input gene(s), Cubé looks for simple & nonli
 
 ![Cubé](https://github.com/connerlambden/Cube/raw/main/images/cube_network_genes_discovery.png)
 
-***
+</br>
 
 
 ## Install
@@ -18,7 +19,7 @@ Given a single-cell dataset and an input gene(s), Cubé looks for simple & nonli
 `$ python3 -m pip install git+https://github.com/connerlambden/Cube.git`
 
 
-***
+</br>
 
 
 ## Running Cubé
@@ -36,7 +37,7 @@ cube.run_cube(adata=adata, seed_gene_1='ifng', seed_gene_2='tbx21', go_files=go_
 __[Example Outputs](https://github.com/connerlambden/Cube/blob/main/cube_example_results.zip?raw=true)__
 
 
-***
+</br>
 
 
 ## Inputs
@@ -57,8 +58,8 @@ __num_search_children__: How many search children to add to the network on each 
 
 __search_depth__: Recursive search depth. Values above 2 may take a long time to run
 
+</br>
 
-***
 
 
 ## Outputs
@@ -71,8 +72,7 @@ __*.graphml file__. Network file that can be visualized in programs like [Cytosc
 
 __Cubé_network.png__: Network visualization where green edges are positive correlation & red edges are negative correlation. For better visualizations, we recommend loading the .graphml file into [Cytoscape](https://cytoscape.org/)
 
-***
-
+</br>
 
 ## Visualizing The Product of 2 Genes Using Scanpy
 
@@ -86,7 +86,7 @@ adata_expressing_both.obs[gene_1 + ' * ' + gene_2] = np.exp(adata_expressing_bot
 sc.pl.umap(adata_expressing_both, color=[gene_1 + ' * ' + gene_2])
 ```
 
-***
+</br>
 
 
 ## Why Cubé?
@@ -96,12 +96,15 @@ sc.pl.umap(adata_expressing_both, color=[gene_1 + ' * ' + gene_2])
 
 Single-cell RNA sequencing has allowed for unprecedented resolution into the transcriptome of single cells, however the sheer complexity of the data and high rates of dropout have posed interpretive and computational challenges to create biological meanings and gene relationships. Many methods have been proposed for inferring gene regulatory networks, leading to sometimes dramatic differences depending upon the initial assumptions made 😬. Even in the case of unsupervised learning ([UMAP](https://umap-learn.readthedocs.io/en/latest/)) or clustering ([Leiden](https://github.com/vtraag/leidenalg)), it’s not clear how to balance local/global structure or what data features are most important. Additionally, these “black-box” machine learning methods are closed to scrutiny of their inner workings and cannot explicate logical, understandable steps and tend to be fragile to model parameters. Cubé addresses the dropout issue by only comparing sets of genes together in cells that have nonzero expression in all cells. This removes the need for biased imputation methods and focuses each relationship to relevant cells. Cubé addresses the interpretability problem by presenting solutions in the form of expression(gene1) ~= expression(gene2) * expression(gene3) which succinctly express nonlinear relationships between specific genes in an understandable way without any pesky parameters. Since Cubé samples from the space of all possible nonlinear gene-gene pairs, results have high representational capacity and low ambiguity. Cubé is a descriptive search algorithm that optimizes for biologically & statistically informed gene patterns.
 
-***
+</br>
 
 
 ## How It Works Under The Hood
 
 ![Cubé](https://github.com/connerlambden/Cube/raw/main/images/cube_gene_regulatory_network.png)
+
+
+</br>
 
 Special Thanks to [Vijay Kuchroo](https://kuchroolab.bwh.harvard.edu/), [Ana Anderson](https://anacandersonlab.com/), [Lloyd Bod](https://twitter.com/lloydcaipi), & [Aviv Regev](https://www.broadinstitute.org/regev-lab)
 
