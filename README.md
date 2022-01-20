@@ -1,4 +1,4 @@
-# Cubé: Intuitive Nonparametric Gene Network Search Algorithm
+# Cubé: Intuitive Gene Network Search Algorithm
 ![Cubé](https://github.com/connerlambden/Cube/raw/main/images/cube%CC%81_header.jpg)
 
 
@@ -106,7 +106,10 @@ Single-cell RNA sequencing has allowed for unprecedented resolution into the tra
 
 
 </br>
+
 #
+
+</br>
 
 Special Thanks to [Vijay Kuchroo](https://kuchroolab.bwh.harvard.edu/), [Ana Anderson](https://anacandersonlab.com/), [Lloyd Bod](https://twitter.com/lloydcaipi), & [Aviv Regev](https://www.broadinstitute.org/regev-lab)
 
